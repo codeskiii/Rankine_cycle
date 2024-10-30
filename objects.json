@@ -1,0 +1,47 @@
+{
+    "physicalObjects" : {
+        "condenser" : {
+            "parameters" : [
+                "P_condenser",
+                "T_condenser",
+                "Q_out",
+                "m_cool"
+            ]
+        },
+        "pump" : {
+            "parameters" : [
+                "P_pump_in",
+                "P_pump_out",
+                "η_pump",
+                "W_pump",
+                "m"
+            ]
+        },
+        "boiler" : {
+            "parameters" : [
+                "Q_in",
+                "P_boiler",
+                "T_boiler",
+                "m"
+            ]
+        },
+        "turbine" : {
+            "parameters" : [
+                "P_turbine_in",
+                "T_turbine_in",
+                "P_turbine_out",
+                "η_turbine",
+                "W_turbine"
+            ]
+        },
+        "pipe" : {
+            "parameters" : [
+                "Pressure Rating",
+                "Temperature Rating",
+                "Flow Rate",
+                "Insulation",
+                "Pressure Drop"
+            ]
+        }
+    }
+}

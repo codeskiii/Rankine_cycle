@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Main content styling */
+        h2, p {
+            text-align: center;
+        }
+
+        /* Item Bar Styling */
+        .item-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #222;
+            padding: 0.5em 1em;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index: 1000;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        /* Individual item styling */
+        .item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+            padding: 0.5em;
+        }
+
+        .item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-bottom: 0.4em;
+        }
+
+        .item span {
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        /* Hover effect for items */
+        .item:hover {
+            transform: scale(1.1);
+            color: #4CAF50;
+        }
+
+        /* Draggable object styling */
+        .draggable {
+            width: 50px;
+            height: 50px;
+            background-color: #3498db;
+            border-radius: 8px;
+            position: absolute;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Parameter input box styling */
+        .parameter-input {
+            display: none; /* Start as hidden */
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            z-index: 2000;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 600px) {
+            .item-bar {
+                padding: 0.5em;
+            }
+
+            .item img {
+                width: 35px;
+                height: 35px;
+            }
+        }
+  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Bottom Item Bar</title>
+</head>
+<body id="placement-area">
+    
+  <!-- Main Content (placeholder) -->
+  <div style="padding: 20px; height: 90vh;">
+      <h2>Welcome to the Thermodynamics Sandbox</h2>
+  </div>
+
+  <script>
+        let objects = [];
+        let isFollowingMouse = false;
+        let currentElement = null;
+
+        function spawn_element(elements) {
+            // Create and style a new draggable element
+            const newElement = document.createElement('div');
+            newElement.className = 'draggable';
+            newElement.style.width = '100px';
+            newElement.style.height = '100px';
+            newElement.style.backgroundColor = 'lightblue';
+            
+            // Set initial position
+            const x = 100;
+            const y = 150;
+            newElement.style.position = 'absolute';
+            newElement.style.left = `${x}px`;
+            newElement.style.top = `${y}px`;
+
+            // Make the element draggable
+            newElement.addEventListener('mousedown', () => {
+                isFollowingMouse = true;
+                currentElement = newElement;
+            });
+
+            newElement.addEventListener('mouseover', () => {
+                newElement.style.backgroundColor = 'lightcoral'; // Change color on hover
+                showParameterInput(newElement); 
+            });
+
+            newElement.addEventListener('mouseout', () => {
+                newElement.style.backgroundColor = 'lightblue'; // Revert color when not hovering
+                hideParameterInput();
+            });
+
+            const container = document.getElementById('placement-area');
+            container.appendChild(newElement);
+
+            createParameterInput(newElement);
+            
+            // Initialize newPhysObj and assign properties based on elements
+            let newPhysObj = {};
+            elements.forEach((element, index) => {
+                newPhysObj[element] = 0;  // Assign initial value as 0 for each element
+            });
+
+            objects.push(newPhysObj);
+        }
+
+        // Move the active element with the mouse
+        document.addEventListener('mousemove', (event) => {
+            if (isFollowingMouse && currentElement) {
+                currentElement.style.left = `${event.clientX - currentElement.offsetWidth / 2}px`;
+                currentElement.style.top = `${event.clientY - currentElement.offsetHeight / 2}px`;
+            }
+        });
+
+        // Release the active element on mouse up
+        document.addEventListener('mouseup', () => {
+            if (isFollowingMouse) {
+                isFollowingMouse = false;
+                currentElement = null;
+            }
+        });
+
+        function showParameterInput(element) {
+            const inputBox = document.getElementById('parameter-input');
+            const rect = element.getBoundingClientRect();
+            inputBox.style.display = 'block';
+            inputBox.style.left = `${rect.left}px`;
+            inputBox.style.top = `${rect.bottom + window.scrollY}px`; // Position below the element
+        }
+
+        // Function to hide the parameter input box
+        function hideParameterInput() {
+            const inputBox = document.getElementById('parameter-input');
+            inputBox.style.display = 'none';
+        }
+
+        // Function to create input box for parameters
+        function createParameterInput(draggableElement) {
+            const inputBox = document.createElement('div');
+            inputBox.id = 'parameter-input';
+            inputBox.className = 'parameter-input';
+            inputBox.innerHTML = `
+                <label>
+                    Parametr 1:
+                    <input type="number" onchange="updateParameter('${draggableElement.id}', 'Parametr 1', this.value)" />
+                </label>
+                <br>
+                <label>
+                    Parametr 2:
+                    <input type="number" onchange="updateParameter('${draggableElement.id}', 'Parametr 2', this.value)" />
+                </label>
+            `;
+            document.body.appendChild(inputBox);
+        }
+
+        // Function to update parameters
+        function updateParameter(elementId, paramName, value) {
+            // Here you would update your object/logic based on the parameter
+            console.log(`Updated ${paramName} for ${elementId} to ${value}`);
+        }
+
+        // Move the active element with the mouse
+        document.addEventListener('mousemove', (event) => {
+            if (isFollowingMouse && currentElement) {
+                currentElement.style.left = `${event.clientX - currentElement.offsetWidth / 2}px`;
+                currentElement.style.top = `${event.clientY - currentElement.offsetHeight / 2}px`;
+            }
+        });
+
+        // Release the active element on mouse up
+        document.addEventListener('mouseup', () => {
+            if (isFollowingMouse) {
+                isFollowingMouse = false;
+                currentElement = null;
+            }
+        });
+
+  </script>
+
+  <!-- Bottom Item Bar -->
+  <div class="item-bar">
+      <% for (var obj in physicalObjects) { %>
+          <div class="item" onclick="spawn_element(<%= JSON.stringify(physicalObjects[obj].parameters) %>)">
+              <span><strong><%= obj.charAt(0).toUpperCase() + obj.slice(1) %>:</strong></span>
+              <ul>
+                  <% for (var i = 0; i < physicalObjects[obj].parameters.length; i++) { %>
+                      <li><%= physicalObjects[obj].parameters[i] %></li>
+                  <% } %>
+              </ul>
+          </div>
+      <% } %>
+  </div>
+</body>
+</html>
